@@ -1,0 +1,4 @@
+services.system:
+    library: localhost:8060/api/v1/
+    reservation: localhost:8070/api/v1/
+    rating: localhost:8050/api/v1/

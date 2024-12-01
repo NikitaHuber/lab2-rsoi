@@ -40,7 +40,7 @@ class LibraryService(
     fun getLibraryBooks(libraryUUID: UUID, pageRequest: PageRequest, showAll: Boolean) : PageableResponse<BookResponse> {
         val libraryId = libraryRepository.findAllByLibraryUid(libraryUUID).first().id
         val books = bookLibraryRepository.findAllByLibraryId(libraryId!!, pageRequest)
-            .apply { if (!showAll) filter { it.availableСount!! > 0} }
+            .filter { showAll || it.availableСount!! > 0}
             .map {
                 it.book!!.toResponse(it.availableСount!!)
             }

@@ -1,6 +1,7 @@
 package bmstu.nzagainov.libraryservice.services
 
 import bmstu.nzagainov.libraryservice.domain.Book
+import bmstu.nzagainov.libraryservice.domain.BookLibrary
 import bmstu.nzagainov.libraryservice.domain.Condition
 import bmstu.nzagainov.libraryservice.domain.Library
 import bmstu.nzagainov.libraryservice.model.BookResponse
@@ -20,7 +21,7 @@ import java.util.*
 class LibraryService(
     private val libraryRepository: LibraryRepository,
     private val bookRepository: BookRepository,
-    private val bookLibraryRepository: BookLibraryRepository
+    private val bookLibraryRepository: BookLibraryRepository,
 ) {
 
     @Transactional
@@ -36,10 +37,13 @@ class LibraryService(
 
 
     @Transactional
-    fun getLibraryBooks(libraryUUID: UUID, pageRequest: PageRequest) : PageableResponse<BookResponse> {
+    fun getLibraryBooks(libraryUUID: UUID, pageRequest: PageRequest, showAll: Boolean) : PageableResponse<BookResponse> {
         val libraryId = libraryRepository.findAllByLibraryUid(libraryUUID).first().id
         val books = bookLibraryRepository.findAllByLibraryId(libraryId!!, pageRequest)
-            .map { it.book!!.toResponse(it.availableСount!!) }
+            .apply { if (!showAll) filter { it.availableСount!! > 0} }
+            .map {
+                it.book!!.toResponse(it.availableСount!!)
+            }
         return PageableResponse(
             page = pageRequest.pageNumber,
             pageSize = pageRequest.pageSize,
@@ -48,12 +52,24 @@ class LibraryService(
         )
     }
 
+    @Transactional
     fun changeBookCondition(bookUid: String, condition: Condition) {
         val book = bookRepository.findByBookUid(UUID.fromString(bookUid))
             .orElseThrow { throw EntityNotFoundException("Book $bookUid not found") }
 
         book.condition = condition
         bookRepository.save(book)
+    }
+
+    @Transactional
+    fun changeAvailableCount(libraryUid: String, bookUid: String, availableCount: Int) {
+        val entity: BookLibrary = bookLibraryRepository
+            .findByBookUidAndLibraryUid(UUID.fromString(bookUid), UUID.fromString(libraryUid))
+            .orElseThrow {
+                throw EntityNotFoundException("Book $bookUid not found")
+            }
+        entity.availableСount = entity.availableСount!! + availableCount
+        bookLibraryRepository.save(entity)
     }
 
     private fun Library.toResponse() = LibraryResponse(

@@ -22,11 +22,17 @@ class LibraryController(private val libraryService: LibraryService) {
         @PathVariable libraryUid: String,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
-    ) = libraryService.getLibraryBooks(UUID.fromString(libraryUid), PageRequest.of(page, size))
+        @RequestParam(defaultValue = "false") showAll: Boolean
+    ) = libraryService.getLibraryBooks(UUID.fromString(libraryUid), PageRequest.of(page, size), showAll)
 
-    @PutMapping("books/{bookUid}")
-    fun updateBookCondition(
+    @PutMapping("libraries/{libraryUid}/books/{bookUid}")
+    fun updateBook(
+        @PathVariable libraryUid: String,
         @PathVariable bookUid: String,
-        @RequestParam condition: Condition,
-    ) = libraryService.changeBookCondition(bookUid, condition)
+        @RequestParam(required = false) condition: Condition?,
+        @RequestParam(required = false) availableCountDiff: Int?,
+    ) {
+        condition?.let { libraryService.changeBookCondition(bookUid, condition) }
+        availableCountDiff?.let { libraryService.changeAvailableCount(libraryUid, bookUid, it) }
+    }
 }

@@ -1,10 +1,10 @@
 server:
-  port: 8060
+  port: 8070
 spring:
-  application.name: libraryservice
+  application.name: reservationservice
   profiles.active: local
   datasource:
-    url: jdbc:postgresql://localhost:5432/libraries
+    url: jdbc:postgresql://localhost:5432/reservations
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver

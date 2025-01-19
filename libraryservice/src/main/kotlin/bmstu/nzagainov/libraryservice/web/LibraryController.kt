@@ -17,6 +17,14 @@ class LibraryController(private val libraryService: LibraryService) {
         @RequestParam(defaultValue = "10") size: Int
     ) = libraryService.getLibrariesByCity(city, PageRequest.of(page, size))
 
+    @GetMapping("libraries/{libraryUid}")
+    fun getLibrary(@PathVariable libraryUid: String) = libraryService.getLibrary(libraryUid)
+
+    @GetMapping("books/{bookUid}")
+    fun getLibraryBooks(
+        @PathVariable bookUid: String,
+    ) = libraryService.getBook(bookUid)
+
     @GetMapping("libraries/{libraryUid}/books")
     fun getLibraryBooks(
         @PathVariable libraryUid: String,

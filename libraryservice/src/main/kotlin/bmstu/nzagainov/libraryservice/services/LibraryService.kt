@@ -72,6 +72,18 @@ class LibraryService(
         bookLibraryRepository.save(entity)
     }
 
+    @Transactional
+    fun getLibrary(libraryUUID: String): LibraryResponse {
+        return libraryRepository.findAllByLibraryUid(UUID.fromString(libraryUUID)).first().toResponse()
+    }
+
+    @Transactional
+    fun getBook(bookUid: String): BookResponse {
+        return bookRepository.findByBookUid(UUID.fromString(bookUid))
+            .orElseThrow { throw EntityNotFoundException("Book $bookUid not found") }
+            .toResponse(0)
+    }
+
     private fun Library.toResponse() = LibraryResponse(
         libraryUid!!,
         name!!,

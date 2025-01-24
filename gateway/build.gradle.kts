@@ -26,12 +26,14 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("org.springframework.boot:spring-boot-starter-actuator:3.4.2")
 
     // https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java
     implementation("com.mashape.unirest:unirest-java:1.4.9")
 
     implementation("org.springframework.boot:spring-boot-configuration-processor")
 }
+
 
 kotlin {
     compilerOptions {

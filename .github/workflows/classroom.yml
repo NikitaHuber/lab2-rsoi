@@ -29,12 +29,21 @@ jobs:
           chmod +x reservationservice/gradlew;
           chmod +x ratingservice/gradlew;
 
-      - name: Build 
-        run: 
-          ./gateway/gradlew build;
-          ./libraryservice/gradlew build;
-          ./reservationservice/gradlew build;
-          ./ratingservice/gradlew build;
+      - name: Build gateway
+        working-directory: gateway
+        run: ./gradlew build
+
+      - name: Build libraryservice
+        working-directory: libraryservice
+        run: ./gradlew build
+
+      - name: Build reservationservice
+        working-directory: reservationservice
+        run: ./gradlew build
+
+      - name: Build ratingservice
+        working-directory: ratingservice
+        run: ./gradlew build
 
       # - name: Build project
       #   uses: eskatos/gradle-command-action@v2

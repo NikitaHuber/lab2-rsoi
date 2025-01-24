@@ -8,6 +8,40 @@ on:
       - master
 jobs:
   build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - gateway
+          - libraryservice
+          - reservationservice
+          - ratingservice
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Prepare OpenJDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "corretto"
+          java-version: "21"
+          cache: "gradle"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ${{ matrix.project }}/gradlew
+
+      - name: Build ${{ matrix.project }}
+        working-directory: ${{ matrix.project }}
+        run: ./gradlew build
+
+      # - name: Build project
+      #   uses: eskatos/gradle-command-action@v2
+      #   with:
+      #     arguments: clean build
+
+  grade:
     name: Autograding
     runs-on: ubuntu-latest
     steps:
@@ -34,25 +68,14 @@ jobs:
       - name: Run API Tests
         uses: matt-ball/newman-action@master
         with:
-          # TODO insert your variant
-          collection: <variant>/postman/collection.json
-          environment: <variant>/postman/environment.json
+          collection: v4/postman/collection.json
+          environment: v4/postman/environment.json
           delayRequest: 100
           reporters: '[ "cli" ]'
 
       - uses: education/autograding@v1
         id: autograder
         continue-on-error: true
-
-      - name: Github auto grader mark
-        uses: Romanow/google-sheet-autograder-marker@v1.0
-        with:
-          google_token: ${{secrets.GOOGLE_API_KEY}}
-          sheet_id: "1xkgjUX6Qmk7rdJG-QPOToav-HWWtthJjnShIKnw3oIY"
-          homework_number: 2
-          user_column: 'D'
-          column_offset: 'F'
-          mark: "'+"
 
       - name: Stop containers
         if: always()

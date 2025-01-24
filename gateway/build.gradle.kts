@@ -7,7 +7,6 @@ plugins {
 }
 
 group = "bmstu.nzagainov"
-version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
@@ -29,7 +28,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator:3.4.2")
 
     // https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java
-    implementation("com.mashape.unirest:unirest-java:1.4.9")
 
     implementation("org.springframework.boot:spring-boot-configuration-processor")
 }

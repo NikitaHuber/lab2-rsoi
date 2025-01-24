@@ -10,13 +10,10 @@ import org.springframework.stereotype.Service
 class RatingService(
     private val ratingRepository: RatingRepository
 ) {
-    fun getRating(userName: String) = ratingRepository.findByUserName(userName)
-        .orElseThrow { throw EntityNotFoundException("Person $userName not found") }
-        .toResponse()
+    fun getRating(userName: String) = getOrCreateRating(userName).toResponse()
 
     fun updateRating(userName: String, diff: Int) {
-        val rating = ratingRepository.findByUserName(userName)
-            .orElseThrow { throw EntityNotFoundException("Person $userName not found") }
+        val rating = getOrCreateRating(userName)
 
         if (rating.stars!! + diff > 100)
             rating.stars = 100
@@ -30,6 +27,17 @@ class RatingService(
     fun addRating(user: String) {
         ratingRepository.save(Rating(userName = user, stars = 1))
     }
+
+    private fun getOrCreateRating(user: String): Rating {
+        val entity = ratingRepository.findByUserName(user)
+        return if (entity.isPresent) {
+            entity.get()
+        } else {
+            ratingRepository.save(getInitialRating(user))
+        }
+    }
+
+    private fun getInitialRating(user: String) = Rating(userName = user, stars = 75)
 
     private fun Rating.toResponse() = RatingResponse(stars = this.stars!!)
 }

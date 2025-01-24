@@ -5,6 +5,7 @@ import bmstu.nzagainov.gateway.domain.*
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.RestTemplate
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -15,6 +16,8 @@ class GatewayController(
 ) {
 
     private val restTemplate = RestTemplate()
+
+    private val dateApiFormat = SimpleDateFormat("yyyy-MM-dd")
 
     @GetMapping("/libraries")
     fun getLibraries(
@@ -66,7 +69,7 @@ class GatewayController(
             RatingResponse::class.java
         )
         if (rating!!.stars <= rentedSize) {
-            throw Error("Validation Error")
+            throw Error("Allowable count: ${rating.stars}, taken: $rentedSize")
         }
 
         val reservation = restTemplate.postForObject(
@@ -77,8 +80,8 @@ class GatewayController(
         return TakeBookResponse(
             reservationUid = reservation!!.reservationUid,
             status = reservation.status,
-            startDate = reservation.startDate!!,
-            tillDate = reservation.tillDate!!,
+            startDate = dateApiFormat.format(reservation.startDate!!),
+            tillDate = dateApiFormat.format(reservation.tillDate!!),
             book = getBookShortResponse(reservation.bookUid!!)!!,
             library = getLibrary(reservation.libraryUid!!)!!,
             rating = rating,
@@ -114,6 +117,14 @@ class GatewayController(
         if (diff == 0) diff += 1
         requestStarsDiff(diff, userName)
     }
+
+    @GetMapping("/rating")
+    fun getRating(
+        @RequestHeader("X-User-Name") userName: String
+    ) = restTemplate.getForObject(
+            "${pathResolver.rating}/rating?user=$userName",
+            RatingResponse::class.java
+        )!!
 
     private fun requestStarsDiff(diff: Int, userName: String) {
         restTemplate.put(

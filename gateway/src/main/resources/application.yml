@@ -3,3 +3,4 @@ server:
 spring:
     application.name: gateway
     profiles.active: local
+    data.web.pageable.one-indexed-parameters: true

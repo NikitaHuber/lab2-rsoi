@@ -3,6 +3,7 @@ package bmstu.nzagainov.libraryservice.web
 import bmstu.nzagainov.libraryservice.domain.Condition
 import bmstu.nzagainov.libraryservice.services.LibraryService
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -13,9 +14,8 @@ class LibraryController(private val libraryService: LibraryService) {
     @GetMapping("libraries")
     fun getLibrariesByCity(
         @RequestParam city: String,
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "10") size: Int
-    ) = libraryService.getLibrariesByCity(city, PageRequest.of(page, size))
+        pageable: Pageable,
+    ) = libraryService.getLibrariesByCity(city, PageRequest.of(pageable.pageNumber, pageable.pageSize))
 
     @GetMapping("libraries/{libraryUid}")
     fun getLibrary(@PathVariable libraryUid: String) = libraryService.getLibrary(libraryUid)
@@ -28,10 +28,9 @@ class LibraryController(private val libraryService: LibraryService) {
     @GetMapping("libraries/{libraryUid}/books")
     fun getLibraryBooks(
         @PathVariable libraryUid: String,
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "10") size: Int,
-        @RequestParam(defaultValue = "false") showAll: Boolean
-    ) = libraryService.getLibraryBooks(UUID.fromString(libraryUid), PageRequest.of(page, size), showAll)
+        @RequestParam(defaultValue = "false") showAll: Boolean,
+        pageable: Pageable
+    ) = libraryService.getLibraryBooks(UUID.fromString(libraryUid), PageRequest.of(pageable.pageNumber, pageable.pageSize), showAll)
 
     @PutMapping("libraries/{libraryUid}/books/{bookUid}")
     fun updateBook(

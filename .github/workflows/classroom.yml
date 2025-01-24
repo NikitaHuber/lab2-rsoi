@@ -7,6 +7,13 @@ on:
     branches:
       - master
 jobs:
+  strategy:
+      matrix:
+        project:
+          - gateway
+          - libraryservice
+          - reservationservice
+          - ratingservice
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -23,33 +30,23 @@ jobs:
           cache: "gradle"
 
       - name: Grant execute permission for gradlew
-        run: 
-          chmod +x gateway/gradlew;
-          chmod +x libraryservice/gradlew;
-          chmod +x reservationservice/gradlew;
-          chmod +x ratingservice/gradlew;
+        run: chmod +x ${{ matrix.project }}/gradlew
 
-      - name: Build gateway
-        working-directory: gateway
+      - name: Build ${{ matrix.project }}
+        working-directory: ${{ matrix.project }}
         run: ./gradlew build
 
-      - name: Build libraryservice
-        working-directory: libraryservice
-        run: ./gradlew build
-
-      - name: Build reservationservice
-        working-directory: reservationservice
-        run: ./gradlew build
-
-      - name: Build ratingservice
-        working-directory: ratingservice
-        run: ./gradlew build
+      - name: Upload artifact ${{ matrix.project }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.project }}-jar
+          path: ${{ matrix.project }}/build/libs/*.jar
+          retention-days: 1
 
       # - name: Build project
       #   uses: eskatos/gradle-command-action@v2
       #   with:
       #     arguments: clean build
-
   grade:
     name: Autograding
     runs-on: ubuntu-latest
@@ -59,6 +56,27 @@ jobs:
           fetch-depth: 0
 
       - uses: docker/setup-buildx-action@v2
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: gateway-jar
+          path: gateway/build/libs/
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: libraryservice-jar
+          path: libraryservice/build/libs/
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: reservationservice-jar
+          path: reservationservice/build/libs/
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: ratingservice-jar
+          path: ratingservice/build/libs/
+
 
       # TODO build and run unit tests
 

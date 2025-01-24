@@ -10,13 +10,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        project:
-          - gateway
-          - libraryservice
-          - reservationservice
-          - ratingservice
     steps:
       - uses: actions/checkout@v3
         with:
@@ -30,11 +23,19 @@ jobs:
           cache: "gradle"
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ${{ matrix.project }}/gradlew
+        run: 
+          chmod +x gateway/gradlew;
+          chmod +x libraryservice/gradlew;
+          chmod +x reservationservice/gradlew;
+          chmod +x ratingservice/gradlew;
 
-      - name: Build ${{ matrix.project }}
-        working-directory: ${{ matrix.project }}
-        run: ./gradlew build
+      - name: Build 
+        working-directory:
+        run: 
+          ./gateway/gradlew build;
+          ./libraryservice/gradlew build;
+          ./reservationservice/gradlew build;
+          ./ratingservice/gradlew build;
 
       # - name: Build project
       #   uses: eskatos/gradle-command-action@v2

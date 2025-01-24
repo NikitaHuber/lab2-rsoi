@@ -30,7 +30,6 @@ jobs:
           chmod +x ratingservice/gradlew;
 
       - name: Build 
-        working-directory:
         run: 
           ./gateway/gradlew build;
           ./libraryservice/gradlew build;

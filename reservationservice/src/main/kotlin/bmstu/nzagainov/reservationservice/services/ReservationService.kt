@@ -7,18 +7,17 @@ import java.util.*
 
 @Service
 class ReservationService(
-    val repository: ReservationRepository,
     private val reservationRepository: ReservationRepository,
 ) {
 
     fun findByStatusAndUserName(status: Status, userName: String) =
-        repository.findAllByStatusAndUsername(status, userName)
+        reservationRepository.findAllByStatusAndUsername(status, userName)
 
-    fun findAllByUsername(userName: String) = repository.findAllByUserName(userName)
+    fun findAllByUsername(userName: String) = reservationRepository.findAllByUserName(userName)
 
     fun addReservation(userName: String, request: ReservationRequest): ReservationResponse {
         val reservation = request.formReservation(userName)
-        repository.save(reservation)
+        reservationRepository.save(reservation)
         return reservation.toResponse()
     }
 
